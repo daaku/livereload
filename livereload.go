@@ -24,6 +24,7 @@ const JS = `
   };
   const monitor = () => {
     const es = new EventSource('/livereload');
+    window.addEventListener('beforeunload', () => es.close());
     es.addEventListener('token', ev => {
       if (!token) {
         token = event.data;
