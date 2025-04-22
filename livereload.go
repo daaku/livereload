@@ -56,24 +56,15 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	})
 	done := r.Context().Done()
 
-	rc := http.NewResponseController(w)
-	ticker := time.NewTicker(time.Minute)
-	defer ticker.Stop()
-	for {
-		_, err := fmt.Fprintf(w, "event: token\ndata: %d\n\n", now.UnixMicro())
-		if err != nil {
-			return
-		}
-		if err := rc.Flush(); err != nil {
-			return
-		}
-		select {
-		case <-shutdown:
-			return
-		case <-done:
-			return
-		case <-ticker.C:
-			continue
-		}
+	_, err := fmt.Fprintf(w, "event: token\ndata: %d\n\n", now.UnixMicro())
+	if err != nil {
+		return
+	}
+	if err := http.NewResponseController(w).Flush(); err != nil {
+		return
+	}
+	select {
+	case <-shutdown:
+	case <-done:
 	}
 }
